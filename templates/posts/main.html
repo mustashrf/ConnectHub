@@ -1,0 +1,133 @@
+{% extends 'base.html' %} 
+
+{% block title %}Posts{% endblock title %}
+
+{% block content %}
+
+    <div class="ui grid">
+
+        <div class="eleven wide column">
+            {% for post in posts %}
+
+                <div class="ui fluid card">
+                    <div class="content">
+                        <div class="right floated meta">
+                            <div class="ui grid">
+                                <div class="row">
+                                    {% if request.user == post.author.user %}
+                                        <a href="{% url 'posts:update-view' post.pk %}"><button class="ui button primary">Update</button></a>
+                                        <a href="{% url 'posts:delete-view' post.pk %}"><button class="ui button negative">Delete</button></a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <img class="ui avatar image" src="{{post.author.avatar.url}}" />
+                        {% if post.author.first_name %}
+                            <b>{{post.author.first_name}} {{post.author.last_name}}</b>&nbsp;&nbsp;&nbsp;&nbsp;{{post.created|timesince}} ago
+                        {% else %}
+                            <b>{{post.author.user}}</b>&nbsp;&nbsp;&nbsp;&nbsp;{{post.created|timesince}} ago
+                        {% endif %}
+                    </div>
+
+                    <div class="content">
+                        <b><p>{{ post.content }}</p></b>
+                        <div class="ui fluid image">
+                            {% if post.image %}
+                                <img src="{{post.image.url}}"/>
+                            {% endif %}
+                        </div>
+                        <hr>
+                        <div class="left floated">
+                            <!--Like Form-->
+                            <form action="{% url 'posts:like-view' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="post_id" value="{{post.id}}" />
+                                <button type="submit" class="ui button">
+                                    {% if profile not in post.liked.all %}
+                                    <i class="thumbs up icon"></i>
+                                    {% else %}
+                                    <i class="thumbs down icon"></i>
+                                    {% endif %}
+                                    {{post.likes_num}}
+                                </button>
+                                {{ post.comments_num }} <i class="comment icon" style="color:#6C757D;"></i>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!--Show comments-->
+                    <div class="extra content">
+                        <div class="mb-5"></div>
+                        <button class="cmt_btn ui button mb-5">Comments</button>
+
+                        <!--Comments list-->
+                        <div class="comment-box" style="display: none">
+                            {% if post.comments.all %}
+                                {% for comment in post.comments.all %}
+                                    <div class="ui segment mb-5">
+                                        <img class="ui avatar image" src="{{comment.user.avatar.url}}" />
+                                        <span>
+                                            <b>{{comment.user.first_name}} {{comment.user.last_name}}</b>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;{{comment.created|timesince}} ago
+                                        </span>
+                                        <div class="mt-5">{{ comment.body }}</div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <hr>
+                        <!--Comment form-->
+                        <form action="" method="POST" class="ui fluid form">
+                            {% csrf_token %}
+                            <input type="hidden" name="post_id" value="{{post.id}}" />
+                            <div class="field">
+                                <div class="ui action input">
+                                    {{ comment_form.as_p }}
+                                    <button type="submit" name="submit_comment_form" class="ui positive button" style="margin-left: 25px;">
+                                        Send
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!--Post Form-->
+        <div class="five wide column">
+            <div class="ui segment">
+                {% if post_added %}
+                    <div class="ui green message">Post successfully published!</div>
+                {% endif %}
+                <form action="" method="POST" class="ui form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{post_form.as_p}}
+                    <button type="submit" name="submit_post_form" class="ui positive button w-full mt-5">
+                        Publish
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock content %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            let display = false;
+            $(".cmt_btn").click(function () {
+            if (display === false) {
+                $(this).next(".comment-box").show("slow");
+                display = true;
+            } else {
+                $(this).next(".comment-box").hide("slow");
+                display = false;
+            }
+            });
+        });
+    </script>
+{% endblock scripts %}
