@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}{{profile.first_name}} {{profile.last_name}}{% endblock title %}
+
+{% block content %}
+
+    <div class="ui grid">
+        <br>
+        <div class="row">
+            <div class="four wide column">
+                <img class="ui medium circular image" src={{profile.avatar.url}}>
+
+                <!--Friend status part-->
+                <div>
+                    {% if profile.user in sent_invitations %}
+                        <form action="{% url 'profiles:ignore-invitation' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_pk" value={{profile.pk}}>
+                            <button type="submit" class="ui negative basic button" style="width:260px;">
+                                <i class="remove icon"></i>Cancel request
+                            </button>
+                        </form>
+
+                    {% elif profile.user in received_invitations %}
+                        <div class="ui buttons">
+                            <form action="{% url 'profiles:add-friend' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_pk" value={{profile.pk}}>
+                                <button type="submit" class="ui positive basic button" style="width:130px;margin-right:5px;">
+                                    <i class="user icon"></i>Accept
+                                </button>
+                            </form>
+                            <form action="{% url 'profiles:reject-invitation' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_pk" value={{profile.pk}}>
+                                <button type="submit" class="ui negative basic button" style="width:130px;">
+                                    <i class="remove icon"></i>Reject
+                                </button>
+                            </form>
+                        </div>
+
+                    {% elif profile.user in friends %}
+                        <form action="{% url 'profiles:remove-friend' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_pk" value={{profile.pk}}>
+                            <button type="submit" class="ui negative basic button" style="width:260px;">
+                                <i class="minus square icon"></i>Remove
+                            </button>
+                        </form>
+                        
+                    {% else %}
+                        {% if profile.user != this_user %}
+                            <form action="{% url 'profiles:send-invitation' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_pk" value={{profile.pk}}>
+                                <button type="submit" class="ui positive basic button" style="width:260px;">
+                                    <i class="plus square icon"></i>Add
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <!--End of friend status part-->
+
+                <h1>{{profile.first_name}} {{profile.last_name}}<br></h1>
+                <h3>{{profile.user}}</h3>
+                <p>{{profile.bio}}</p>
+
+                <div class="ui vertical fluid menu">
+                    <div class="item">
+                        Friends
+                        <div class="ui label">{{profile.friends_num}}</div>
+                    </div>
+                    <div class="item">
+                        Posts
+                        <div class="ui label">{{profile.posts_num}}</div>
+                    </div>
+                    <div class="item">
+                        Likes received
+                        <div class="ui label">{{profile.likes_recieved_num}}</div>
+                    </div>
+                    <div class="item">
+                        Likes given
+                        <div class="ui label">{{profile.likes_given_num}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="twelve wide column">
+                {% if posts_exist %}
+                    {% for post in posts %}
+                        <div class="segment ui fluid">
+                            {% if post.author.first_name %}
+                            <b>{{post.author.first_name}} {{post.author.last_name}}</b>&nbsp;&nbsp;&nbsp;&nbsp;{{post.created|timesince}} ago
+                            {% else %}
+                                <b>{{post.author.user}}</b>&nbsp;&nbsp;&nbsp;&nbsp;{{post.created|timesince}} ago
+                            {% endif %}
+                            <hr>
+
+                            <b>{{post.content}}</b>
+                            {% if post.image %}
+                                <div class="ui fluid image" style="background-color: #d4d3cf;">
+                                    <img style="height:500px;width:510px; margin: 3px 5px 10px 140px;"src="{{post.image.url}}"/>
+                                </div>
+                            {% endif %}
+                            <hr>
+
+                            <b>{{post.likes_num}}</b> Likes &nbsp;&nbsp;
+                            <b>{{ post.comments_num }}</b> Comments
+                        </div>
+                    {% endfor %}
+
+                {% else %}
+                    <div class="ui yellow message">There are no posts yet.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

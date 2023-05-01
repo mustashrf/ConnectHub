@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Invitations{% endblock title %}
+
+{% block content %}
+
+    <ul>
+        {% for available in availables %}
+            <li>{{available}}</li>
+        {% endfor %}
+    </ul>
+
+{% endblock content %}

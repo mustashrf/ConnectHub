@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ profile.first_name }} {{ profile.last_name }}
+{% endblock title %}
+
+{% block content %}
+
+    <!--Update profile modal-->
+    <div class="ui modal update-profile-modal" style="transform: translate(-50%, -50%)">
+        <i class="close icon"></i>
+        <div class="header">
+            Update your Profile
+        </div>
+        <div class="image content">
+            <div class="ui medium image">
+                <img src="{{ profile.avatar.url }}">
+            </div>
+            <div class="description">
+                <div class="ui header">Provide some info about you</div>
+                <div class="actions">
+                    <form action="" method="POST" class="ui form" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="ui positive right labeled icon button">
+                            Update
+                            <i class="checkmark icon"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Show Friends modal -->
+    <div class="ui modal show-friends-modal" style="top: 30%;transform: translateY(-50%);">
+        <i class="close icon"></i>
+        <div class="header">
+            Friends list
+        </div>
+        <div class="content">
+            <div class="description">
+                <div class="actions">
+                    <ul class="ui list">
+                        {% for friend in profile.get_friends %}
+                            <div class="item" style="display: flex; align-items: center;">
+                                <img class="ui mini circular image" src="{{ friend.avatar.url }}" style="margin-right: 10px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                                    {{ friend }}
+                                    <a href={{friend.get_absolute_url}} class="ui primary basic button">View profile</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui segment">
+        {% if confirm %}
+            <div class="ui green message">Your profile has been updated.</div>
+        {% endif %}
+
+        <div class="ui grid">
+            <div class="row">
+                <div class="six wide column">
+                    <img class="ui medium circular image" src="{{profile.avatar.url}}">
+                    <div class="row mt-5">
+                        <button class="ui primary basic button" id="update-profile-btn" style="width:300px;">Update Profile</button>
+                    </div>
+                </div>
+                <div class="ten wide column">
+                    <table class="ui table">
+                        <tbody>
+                            <tr>
+                                <td>Full Name</td>
+                                <td><b>{{profile.first_name}} {{profile.last_name}}<b></td>
+                            </tr>
+                            <tr>
+                                <td>Bio</td>
+                                <td><b>{{profile.bio}}<b></td>
+                            </tr>
+                            <tr>
+                                <td>Username</td>
+                                <td><b>{{profile.user}}<b></td>
+                            </tr>
+                            <tr>
+                                <td>Friends</td>
+                                <td><a class="ui label" id="show-friends-btn" style="color:blue">
+                                    {{profile.friends_num}}
+                                </a></td>
+                            </tr>
+                            <tr>
+                                <td>Number of posts</td>
+                                <td><b>{{profile.posts_num}}<b></td>
+                            </tr>
+                            <tr>
+                                <td>Likes given</td>
+                                <td><b>{{profile.likes_given_num}}<b></td>
+                            </tr>
+                            <tr>
+                                <td>Likes recieved</td>
+                                <td><b>{{profile.likes_recieved_num}}<b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% block scripts %}
+        <script>    
+            $(document).ready(function() {
+                $("#update-profile-btn").click(function() {
+                    $(".update-profile-modal").modal("show");
+                });
+                
+                $("#show-friends-btn").click(function() {
+                    $(".show-friends-modal").modal("show");
+                });
+            });
+        </script>
+    {% endblock scripts %}
+
+{% endblock content %}

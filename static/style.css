@@ -1,5 +1,5 @@
 body {
-    background: #f8f8f8 !important;
+    background: #f0f0f0 !important;
 }
 
 .nav {
@@ -36,4 +36,33 @@ body {
 
 .comment-box {
     display: none;
+}
+
+.ui.dropdown.left {
+    left: auto !important;
+    right: 0 !important;
+}
+
+.modal-centered {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+}
+
+.bg-image {
+    background-image: url('./img/ConnectHub.jpg') !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    background-position: center center !important;
+}
+
+.home-text {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    font-size: 3em;
 }

@@ -8,6 +8,7 @@ django = "*"
 mysqlclient = "*"
 mysql-connector-python = "*"
 pillow = "*"
+django-allauth = "*"
 
 [dev-packages]
 

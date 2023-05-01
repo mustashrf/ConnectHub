@@ -10,11 +10,16 @@ def create_profile(instance, created, **kwargs):
         Profile.objects.create(user=instance)
 
 @receiver(post_save, sender=Relationship)
-def add_friend(instance, created, **kwargs):
+def add_remove_friend(instance, created, **kwargs):
     sender_profile = instance.sender
     receiver_profile = instance.receiver
-    if instance.status == 'accepted':
-        sender_profile.friends.add(receiver_profile.user)
-        receiver_profile.friends.add(sender_profile.user)
-        sender_profile.save()
-        receiver_profile.save()
+
+    if instance.status == 'accept':
+        sender_profile.friends.add(receiver_profile)
+        receiver_profile.friends.add(sender_profile)
+    elif instance.status == 'remove':
+        sender_profile.friends.remove(receiver_profile)
+        receiver_profile.friends.remove(sender_profile)
+
+    sender_profile.save()
+    receiver_profile.save()

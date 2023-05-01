@@ -2,7 +2,6 @@ from django.db import models
 from django.core.validators import FileExtensionValidator
 from profiles.models import Profile
 
-
 # Create your models here.
 class Post(models.Model):
     content = models.TextField()

@@ -15,18 +15,38 @@
                             <div class="ui grid">
                                 <div class="row">
                                     {% if request.user == post.author.user %}
-                                        <a href="{% url 'posts:update-view' post.pk %}"><button class="ui button primary">Update</button></a>
-                                        <a href="{% url 'posts:delete-view' post.pk %}"><button class="ui button negative">Delete</button></a>
+                                        <div class="ui button dropdown icon pointing" tabindex="0">
+                                            <i class="ellipsis horizontal icon"></i>
+                                            <div class="menu" tabindex="-1">
+                                                <a class="item" href="{% url 'posts:update-view' post.pk %}"><b>Update</b></a>
+                                                <div class="divider"></div>
+                                                <a class="item" style="color:#800000;" href="{% url 'posts:delete-view' post.pk %}">
+                                                    <b>Delete</b>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <script>
+                                            $('.dropdown')
+                                                .dropdown({
+                                                    transition: 'drop'
+                                                })
+                                            ;
+                                        </script>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
-                        <img class="ui avatar image" src="{{post.author.avatar.url}}" />
-                        {% if post.author.first_name %}
-                            <b>{{post.author.first_name}} {{post.author.last_name}}</b>&nbsp;&nbsp;&nbsp;&nbsp;{{post.created|timesince}} ago
-                        {% else %}
-                            <b>{{post.author.user}}</b>&nbsp;&nbsp;&nbsp;&nbsp;{{post.created|timesince}} ago
-                        {% endif %}
+
+                        <a href={{profile.get_absolute_url}} style="color: black;">
+                            <img class="ui avatar image" src="{{post.author.avatar.url}}" />
+                            {% if post.author.first_name %}
+                                <b>{{post.author.first_name}} {{post.author.last_name}}
+                            {% else %}
+                                <b>{{post.author.user}}
+                            {% endif %}
+                        </a>
+                        </b>&nbsp;&nbsp;&nbsp;&nbsp;{{post.created|timesince}} ago
+
                     </div>
 
                     <div class="content">
@@ -39,10 +59,10 @@
                         <hr>
                         <div class="left floated">
                             <!--Like Form-->
-                            <form action="{% url 'posts:like-view' %}" method="POST">
+                            <form action="{% url 'posts:like-view' %}" method="POST" class="like-form" id="{{post.id}}">
                                 {% csrf_token %}
                                 <input type="hidden" name="post_id" value="{{post.id}}" />
-                                <button type="submit" class="ui button">
+                                <button type="submit" class="ui button like-btn{{post.id}}">
                                     {% if profile not in post.liked.all %}
                                     <i class="thumbs up icon"></i>
                                     {% else %}
@@ -97,7 +117,7 @@
 
         <!--Post Form-->
         <div class="five wide column">
-            <div class="ui segment">
+            <div class="ui segment" style="background-color: #f0f0f0;">
                 {% if post_added %}
                     <div class="ui green message">Post successfully published!</div>
                 {% endif %}
@@ -118,16 +138,50 @@
 {% block scripts %}
     <script>
         $(document).ready(function () {
+            
             let display = false;
             $(".cmt_btn").click(function () {
-            if (display === false) {
-                $(this).next(".comment-box").show("slow");
-                display = true;
-            } else {
-                $(this).next(".comment-box").hide("slow");
-                display = false;
-            }
+                if (display === false) {
+                    $(this).next(".comment-box").show("slow");
+                    display = true;
+                } else {
+                    $(this).next(".comment-box").hide("slow");
+                    display = false;
+                }
             });
+
+            $(".like-form").submit(function(e){
+                e.preventDefault()
+                const post_id = $(this).attr('id')
+                const like_status = $(`.like-btn${post_id}`).children('i').attr('class')
+                const likes_count = parseInt($(`.like-btn${post_id}`).text().trim())
+                const url = $(this).attr('action')
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: {
+                        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
+                        'post_id': post_id,
+                    },
+                    success: function(response){
+                        const like_button = $(`.like-btn${post_id}`);
+                        const like_status = response['value'];
+                        const likes_count = response['likes'];
+
+                        if (like_status === 'Like') {
+                            like_button.html('<i class="thumbs up icon"></i> ' + likes_count);
+                        } else {
+                            like_button.html('<i class="thumbs down icon"></i> ' + likes_count);
+                        }
+                    },
+                    error: function(response){
+                        console.log(response)
+                    },
+                })
+
+            })
+
         });
     </script>
 {% endblock scripts %}

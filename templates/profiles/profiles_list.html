@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}All profiles{% endblock title %}
+
+{% block content %}
+    
+    {% if is_empty %}
+        <h1>There are no profiles to interact with</h1>
+    
+    {% else %}
+        {% for profile in profiles %}
+
+            <div class="ui segment">
+                
+                <div class="ui grid">
+
+                    <div class="row">
+                        
+                        <div class="three wide column">
+                            <img class="ui small circular image" src={{profile.avatar.url}}>
+                            <a href={{profile.get_absolute_url}} class="ui primary basic button" style="margin: 7px 0px 0px 16px;">
+                                View profile
+                            </a>
+                        </div>
+                        
+                        <div class="thirteen wide column">
+
+                            <h3>{{profile.user}}</h3>
+                            <p>{{profile.bio}}</p>
+
+                            {% if profile.user in sent_invitations %}
+                                <form action="{% url 'profiles:ignore-invitation' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="profile_pk" value={{profile.pk}}>
+                                    <button type="submit" class="ui negative basic button">
+                                        <i class="remove icon"></i>Cancel request
+                                    </button>
+                                </form>
+
+                            {% elif profile.user in received_invitations %}
+                                <div class="ui buttons">
+                                    <form action="{% url 'profiles:add-friend' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="profile_pk" value={{profile.pk}}>
+                                        <button type="submit" class="ui positive basic button">
+                                            <i class="user icon"></i>Accept
+                                        </button>
+                                    </form>
+                                    <form action="{% url 'profiles:reject-invitation' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="profile_pk" value={{profile.pk}}>
+                                        <button type="submit" class="ui negative basic button" style="margin-left:5px;">
+                                            <i class="remove icon"></i>Reject
+                                        </button>
+                                    </form>
+                                </div>
+
+                            {% elif profile.user in friends %}
+                                <form action="{% url 'profiles:remove-friend' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="profile_pk" value={{profile.pk}}>
+                                    <button type="submit" class="ui negative basic button">
+                                        <i class="minus square icon"></i>Remove
+                                    </button>
+                                </form>
+                                
+                            {% else %}
+                                <form action="{% url 'profiles:send-invitation' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="profile_pk" value={{profile.pk}}>
+                                    <button type="submit" class="ui positive basic button">
+                                        <i class="plus square icon"></i>Add
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+            
+    {% endif %}
+
+{% endblock content %}

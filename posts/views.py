@@ -1,13 +1,18 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.contrib import messages
 from .models import *
 from .forms import PostForm
 from profiles.models import Profile
 from .forms import PostForm, CommentForm
 from django.views.generic import UpdateView, DeleteView
+from django.contrib import messages
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
+
+@login_required
 def main_view(request):
     posts = Post.objects.all()
     profile = Profile.objects.get(user=request.user)
@@ -49,6 +54,7 @@ def main_view(request):
     }
     return render(request, 'posts/main.html', context)
 
+@login_required
 def like_unlike_post(reuqest):
     user = reuqest.user
     if reuqest.method == 'POST':
@@ -65,19 +71,25 @@ def like_unlike_post(reuqest):
 
         if not created:
             if like.value == 'Like':
-                print('yes')
-                like.value == 'Unlike'
+                like.value = 'Unlike'
             else:
-                like.value == 'Like'
+                like.value = 'Like'
         else:
             like.value = 'Like'
 
         post.save()
         like.save()
 
+        data = {
+            'value': like.value,
+            'likes': post.likes_num,
+        }
+        return JsonResponse(data, safe=False)
+
+
     return redirect('posts:main-view')
 
-class PostDeleteView(DeleteView):
+class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = "posts/confirm_del.html"
     success_url = reverse_lazy('posts:main-view')
@@ -85,11 +97,10 @@ class PostDeleteView(DeleteView):
     def get_object(self, *args, **kwargs):
         post = Post.objects.get(pk=self.kwargs['pk'])
         if post.author.user != self.request.user:
-            messages.warning(self.request, 'In order to proceed with this action, you need to be the author of the post')
-        print(messages)
+            return None
         return post
 
-class PostUpdateView(UpdateView):
+class PostUpdateView(LoginRequiredMixin, UpdateView):
     model = Post
     form_class = PostForm
     template_name = 'posts/update.html'

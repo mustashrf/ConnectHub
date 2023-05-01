@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans "Register" %}{% endblock %}
+
+{% block content %}
+
+<div style="color: white; margin-top:50px;">
+  <h1>{% trans "Create a new account" %}</h1>
+  <form class="signup ui form" id="signup_form" method="post" action="{% url 'account_signup' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+    <button class="ui button secondary" type="submit">{% trans "Register" %} &raquo;</button>
+  </form>
+</div>
+
+<br>
+<a style="color: white; text-decoration: underline;" href="{{ login_url }}">Already have an account? &nbsp;Login</a>
+
+<body class="bg-image"></body>
+
+<style>
+  .nav {
+      background-color: transparent !important;
+      font-weight: bold !important;
+  }
+</style>
+
+{% endblock %}

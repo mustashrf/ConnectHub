@@ -4,27 +4,22 @@
 
 {% block content %}
 
-    {% if messages %}
-        {% for message in messages %}
-            {{mesage}}
-            {% if 'warning' in message.tags %}
-                <div class="ui negative message">
-                    <div class="header">
-                        {{message}}
-                    </div>
-                </div>
-            {% else %}
-                <div class="ui segment">
-                    <h3>Delete post</h3>
-                    <form action="" method="POST">
-                        {% csrf_token %}
-                        <p>Are you sure you want to delete the post?</p>
-                        <button type="submit" class="ui button negative">Yes</button>
-                    </form>
-                </div>
-            {% endif %}
-
-        {% endfor %}
+    {% if not object %}
+        <div class="ui negative message">
+            <div class="header">
+                In order to proceed with this action, you need to be the author of the post
+            </div>
+        </div>
+    {% else %}
+        <div class="ui segment">
+            <h3>Delete post</h3>
+            <form action="" method="POST">
+                {% csrf_token %}
+                <p>Are you sure you want to delete the post?</p>
+                <a href="{% url 'posts:main-view' %}" class="ui button">Cancel</a>
+                <button type="submit" class="ui button negative">Ok</button>
+            </form>
+        </div>
     {% endif %}
 
 {% endblock content %}
