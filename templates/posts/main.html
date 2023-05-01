@@ -63,10 +63,10 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="post_id" value="{{post.id}}" />
                                 <button type="submit" class="ui button like-btn{{post.id}}">
-                                    {% if profile not in post.liked.all %}
-                                    <i class="thumbs up icon"></i>
+                                    {% if profile in post.liked.all %}
+                                    <i class="thumbs up icon blue"></i>
                                     {% else %}
-                                    <i class="thumbs down icon"></i>
+                                    <i class="thumbs up icon"></i>
                                     {% endif %}
                                     {{post.likes_num}}
                                 </button>
@@ -170,9 +170,9 @@
                         const likes_count = response['likes'];
 
                         if (like_status === 'Like') {
-                            like_button.html('<i class="thumbs up icon"></i> ' + likes_count);
+                            like_button.html('<i class="thumbs up icon blue active"></i> ' + likes_count);
                         } else {
-                            like_button.html('<i class="thumbs down icon"></i> ' + likes_count);
+                            like_button.html('<i class="thumbs up icon"></i> ' + likes_count);
                         }
                     },
                     error: function(response){
