@@ -44,8 +44,11 @@ class ProfileListView(LoginRequiredMixin, ListView):
     context_object_name = 'profiles'
 
     def get_queryset(self):
-        profiles = Profile.objects.get_all_profiles(self.request.user)
-        return profiles
+        profile = Profile.objects.get(user=self.request.user)
+        friends = set(profile.get_friends())
+        sent_invitations = set(Relationship.objects.get_sent_invitations(profile))
+        received_invitations = set(Relationship.objects.get_received_invitations(profile))
+        return friends - sent_invitations - received_invitations
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -94,8 +97,8 @@ def received_invitations_view(request):
 def available_invitations_view(request):
     user = request.user
     availables = Profile.objects.get_available_invitations(user)
-    context = {'availables': availables}
-    return render(request, 'profiles/available_invitations.html', context)
+    context = {'profiles': availables}
+    return render(request, 'profiles/profiles_list.html', context)
 
 @login_required
 def remove_friend(request):
