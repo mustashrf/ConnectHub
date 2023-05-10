@@ -2,6 +2,8 @@
 
 ConnectHub is a social media application built with Django that allows users to connect and interact with each other in a seamless and engaging way. This README file provides an overview of the application, its features, and instructions on how to set it up and run it locally.
 
+![Main page](main_page.png)
+
 ## Features
 
 ConnectHub comes with the following features:
@@ -36,20 +38,18 @@ pipenv install
 pipenv shell
 ```
 
-4. Install dependencies:
+1. Install dependencies:
 
     `pipenv install -r requirements.txt`
 
-5. Set up the database:
+2. Set up the database:
 
     `python manage.py migrate`
 
-6. Create a superuser account:
+3. Create a superuser account:
 
     `python manage.py createsuperuser`
 
-7. Start the development server:
+4. Start the development server:
 
     `python manage.py runserver`
-
-![Main page](main_page.png)
