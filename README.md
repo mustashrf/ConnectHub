@@ -24,11 +24,11 @@ To run ConnectHub locally, follow these steps:
 
 1. Clone the repository:
 
-`git clone https://github.com/mustashrf/ConnectHub`
+    `git clone https://github.com/mustashrf/ConnectHub`
 
 2. Change into the project directory:
 
-`cd ConnectHub`
+    `cd ConnectHub`
 
 3. Create a virtual environment and activate it:
 ```
@@ -38,18 +38,18 @@ pipenv shell
 
 4. Install dependencies:
 
-`pipenv install -r requirements.txt`
+    `pipenv install -r requirements.txt`
 
 5. Set up the database:
 
-`python manage.py migrate`
+    `python manage.py migrate`
 
 6. Create a superuser account:
 
-`python manage.py createsuperuser`
+    `python manage.py createsuperuser`
 
 7. Start the development server:
 
-`python manage.py runserver`
+    `python manage.py runserver`
 
 ![Main page](main_page.png)
